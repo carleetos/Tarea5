@@ -1,0 +1,64 @@
+---
+title: "R Notebook, Tarea 5"
+subtitle: "Alejandro Poblete, Carlos Zavala"
+output:
+  html_document:
+    df_print: paged
+---
+
+
+```{r setup, echo= FALSE}
+library(tidyquant)
+library(ggplot2)
+```
+#pregunta 2
+
+se realiza la función que calcula retornos, graficos y jarque bera, se trabaja con precios adjusted
+
+```{r acciones1, echo=TRUE}
+AAPLE <- c("AAPL")
+Microsoft <- c("MSFT")
+
+MSFT <- tq_get(Microsoft, get="stock.prices",
+               from="2000-01-01",
+               to="2018-08-02",
+               periodicity="monthly")
+
+AAPL <- tq_get(AAPLE, get="stock.prices",
+               from="2000-01-01",
+               to="2018-08-02",
+               periodicity="monthly")
+
+```
+
+
+```{r pregunta 2, echo=TRUE}
+
+retorno2 <- function(x) {
+  
+  ret= exp(diff(log(x))) - 1
+  ret2 <-data.frame(ret)
+  
+  g2 = ggplot(mapping=aes(ret))+ geom_histogram(aes(y=..density..),color='red',bins=50, alpha=0.5)+scale_fill_tq()+
+    labs(title="Retornos")
+  
+  g22= ggplot(mapping = aes(x=x)) + geom_density(alpha=0.5)+ scale_fill_tq() + labs(title="Retornos densidad")
+  
+  acom= ggplot(ret2, aes(x=1:223, y=cumsum(ret))) + geom_line() + labs(title="Retornos acomulados") + ylab("retorno acomulado") + xlab("")
+  
+  ske = (1/length(x))*sum((x-mean(x))^3)/((1/length(x))*sum((x-mean(x))^2))^(3/2)
+  kurt= (1/length(x))*sum((x-mean(x))^4)/((1/length(x))*sum((x-mean(x))^2))^(2)
+  JB= length(x)*(((ske^2)/6)+ (((kurt-3)^2)/24))
+  
+  
+  return (list(ret2, g2 ,print(paste("Jarque Bera", "=", JB, ",si JB > valor critico", ",Rechazo H0")),acom, g22))
+}
+
+```
+
+```{r acciones, echo=TRUE}
+retorno2(MSFT$adjusted)
+retorno2(AAPL$adjusted)
+
+```
+
