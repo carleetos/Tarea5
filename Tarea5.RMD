@@ -61,4 +61,4 @@ retorno2(MSFT$adjusted)
 retorno2(AAPL$adjusted)
 
 ```
-
+jano aca
